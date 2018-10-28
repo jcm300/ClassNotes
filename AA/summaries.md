@@ -399,13 +399,10 @@ Conbinado com loop unrolling e pipelining software
 
 ## Vetorização
 
-+------------------------------+---------------------+-----------------------+
 |                              | Data Streams Single | Data Streams Multiple |
-+==============================+=====================+=======================+
+|------------------------------|---------------------|-----------------------|
 | Instruction Streams Single   | SISD                | SIMD                  |
-+------------------------------+---------------------+-----------------------+
 | Instruction Streams Multiple | MISD                | MIMD                  |
-+------------------------------+---------------------+-----------------------+
 
 SPMD: Single Program Multiple Data
 - Programa paralelo num computador MIMD
