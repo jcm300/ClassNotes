@@ -45,7 +45,6 @@ single core: $CPU_{Time} = IC * CPI * T_{clock}$
 - IC é o número de ciclos: determinado por programa, ISA(Instruction set architecture) e compilador
 - CPI é o número de ciclos clock médio por instrução: determinado pelo hardware do CPU
 - $T_{clock}$ é o tempo de ciclo de clock $T_{clock} = 1/f_{clock}$
-    
 
 O desempenho é melhorado com:
 - Redução do número de ciclos de clock
@@ -400,11 +399,13 @@ Conbinado com loop unrolling e pipelining software
 
 ## Vetorização
 
-|                             | Data Streams      |
-|                             | Single | Multiple |
-|-----------------------------|--------|----------|
-|Instruction streams |Single  | SISD   | SIMD     |
-|                    |Multiple| MISD   | MIMD     |
++------------------------------+---------------------+-----------------------+
+|                              | Data Streams Single | Data Streams Multiple |
++==============================+=====================+=======================+
+| Instruction Streams Single   | SISD                | SIMD                  |
++------------------------------+---------------------+-----------------------+
+| Instruction Streams Multiple | MISD                | MIMD                  |
++------------------------------+---------------------+-----------------------+
 
 SPMD: Single Program Multiple Data
 - Programa paralelo num computador MIMD
