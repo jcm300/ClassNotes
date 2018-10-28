@@ -41,10 +41,10 @@ L3 não inclusivo carrega diretamente de memória para L2 e depois L2 guarda se 
 
 ### Tempo de resposta
 
-single core: $CPU_{Time} = IC * CPI * T_{clock}$
+single core: $`CPU_{Time} = IC * CPI * T_{clock}`$
 - IC é o número de ciclos: determinado por programa, ISA(Instruction set architecture) e compilador
 - CPI é o número de ciclos clock médio por instrução: determinado pelo hardware do CPU
-- $T_{clock}$ é o tempo de ciclo de clock $T_{clock} = 1/f_{clock}$
+- $`T_{clock}`$ é o tempo de ciclo de clock $`T_{clock} = 1/f_{clock}`$
 
 O desempenho é melhorado com:
 - Redução do número de ciclos de clock
@@ -54,7 +54,7 @@ O desempenho depende de:
 - Algoritmo: afeta IC e talvez CPI
 - Linguagem de programação: afeta IC e CPI
 - Compilador: afeta IC e CPI
-- ISA: afeta IC, CPI, e $T_{clock}$
+- ISA: afeta IC, CPI, e $`T_{clock}`$
 - Desenho do processador
 
 ## Pipeline
@@ -84,9 +84,9 @@ Loop unroll permite reduzir número de ciclos e, consequentemente, cycle overhea
 - não há dependências entre loads
 - apenas melhora adição de inteiros
 
-Loop unroll com paralelismo para operações associativas(Iteration Splitting): acumular em duas variáveis $->$ merge no fim
+Loop unroll com paralelismo para operações associativas(Iteration Splitting): acumular em duas variáveis $`->`$ merge no fim
 
-Para alcançar $CPI<1$ é necessário completar multiplas instruções por cada ciclo de clock
+Para alcançar $`CPI<1`$ é necessário completar multiplas instruções por cada ciclo de clock
 
 ILP para Multi-threading: multiple issue + dynamic scheduling
 
@@ -95,7 +95,7 @@ ILP para Multi-threading: multiple issue + dynamic scheduling
 Executa várias threads em paralelo
 
 Exige:
-- muitos registos $->$ register spilling
+- muitos registos $`->`$ register spilling
 - Replicação de hardware: registos , PC/IP, etc
 - Troca rápida entre threads
 
@@ -128,9 +128,9 @@ Localidade temporal e espacial asegura que quase todas as referências possam se
 
 Linha de cache(Block): unidade de cópia (atualmente o normal é ser 64 bytes)
 
-Se os dados a aceder está presente no nível superior: Hit ($Hit ratio = hits / accesses$)
+Se os dados a aceder está presente no nível superior: Hit ($`Hit ratio = hits / accesses`$)
 
-Se os dados a aceder não estão presentes: Miss (bloco copiado do nível inferior $Miss ratio = misses/accesses = 1 - Hit ratio$)
+Se os dados a aceder não estão presentes: Miss (bloco copiado do nível inferior $`Miss ratio = misses/accesses = 1 - Hit ratio`$)
 
 Conceitos transversais aos níveis da hierarquia
 - Block placement (Colocação do bloco)
@@ -148,11 +148,11 @@ Memória serve as misses da L2/L3
 
 Disco rígido serve as "misses" da memória
 
-n Sets $->$ n-way Set associative
+n Sets $`->`$ n-way Set associative
 
-Direct-mapped cache $->$ uma entrada por Set
+Direct-mapped cache $`->`$ uma entrada por Set
 
-Fully associative $->$ um Set
+Fully associative $`->`$ um Set
 
 ### Tipos de cache
 
@@ -220,21 +220,21 @@ Virtual memory: Apenas write-back é possível, dada a latência de gravação e
 
 ### Tempo de resposta tendo em conta a hierarquia de memória
 
-$CPU_{Time} = IC * CPI * T_{clock}$
+$`CPU_{Time} = IC * CPI * T_{clock}`$
 - IC: Número de instruções executadas, assume-se constante
 - CPI: clock cycles per instruction
-- $T_{clock}$: período(tempo de ciclo) do clock $T_{clock} = 1/f_{clock}$, assume-se constante contudo não é, visto que se houver sobreaquecimento, o cpu baixa a frequência(aumenta o período)
+- $`T_{clock}`$: período(tempo de ciclo) do clock $`T_{clock} = 1/f_{clock}`$, assume-se constante contudo não é, visto que se houver sobreaquecimento, o cpu baixa a frequência(aumenta o período)
 
 Exemplo - evolução do CPI:
 - Inicial: CPI = 15 
 - Adição de pipeline: CPI = 1, a adição do pipeline permitiu diminuir o ciclo de clock, como tal aumentar a frequência. Permitiu diminuir porque o trabalho que é feito em cada ciclo é agora simples e pouco, visto que o pipeline divide a instrução em pedaços mais simples
 - Adição de ILP: CPI = 0.2, IPL(paralelismo ao nível das instruções apesar de o código ser sequencial), possibilidade de fazer várias partes de instruções ao mesmo tempo
 
-$CPI = CPI_{CPU} + CPI_{mem}$
+$`CPI = CPI_{CPU} + CPI_{mem}`$
 
-$CPI_{mem} = miss rate L1 * LeS rate * miss penalty L1$
+$`CPI_{mem} = miss rate L1 * LeS rate * miss penalty L1`$
 
-$miss penalty L1 = (1- miss rate L2) * miss penalty L2 + miss rate L2 * miss penalty L3ouM$
+$`miss penalty L1 = (1- miss rate L2) * miss penalty L2 + miss rate L2 * miss penalty L3ouM`$
 - LeS rate: percentagem de instruções que vão à memória
 - miss rate: fração de acessos à cache que resultam em miss
 - Notas:
@@ -323,8 +323,8 @@ Menor associatividade reduz consumo de energia porque são acedidas menos linhas
 Para melhorar hit time, prevê o caminho para pre-set mux
 - Mis-prediction origina maior hit time
 - Precisão da previsão:
-    - $> 90\%$ para 2-way
-    - $> 80\%$ para 4-way
+    - $`> 90\%`$ para 2-way
+    - $`> 80\%`$ para 4-way
     - I-cache tem melhor precisão que D-cache
 
 Extendido para prever linha de cache

@@ -2,6 +2,6 @@
 
 Class notes and summaries
 
-Used [Github-flavored Markdown](https://github.github.com/gfm/) for Markdown files.
+Used [GitLab-flavored Markdown](https://docs.gitlab.com/ee/user/markdown.html#gitlab-flavored-markdown-gfm) for Markdown files.
 
-To generate pdf from Mardown file run: `pandoc -f gfm -o output.pdf input.md`
+TODO: Convert to pdf with pandoc
