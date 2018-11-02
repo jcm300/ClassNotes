@@ -481,3 +481,44 @@ Limitações, comparando com arquiteturas vetoriais (antes de AVX):
 Ver slides para ver implementações da Intel e da ARM (slides 22 a 30 em DataParallelism1.pdf)
 
 #### GPU's
+Arquiteturas vetoriais/SIMD-extendidas são abordagens hibridas
+- mix (super)escalar + vector op num único dispositivo
+- highly pipelined abordagem para reduzir penaltys de acesso a memória
+- acesso tightly-closed a memória partilhada: baixa latência
+
+Evolução das arquiteturas vetoriais/SIMD-extendidas
+- PU(Processing Unit) cores com unidades vetoriais
+- Coprocessadores(requer um host escalar), dispositivos de aceleração
+- PU's heterogéneos num SoC: multicore PU's com GPU-cores
+
+Modelo de execução heterogéneo: CPU é o host, GPU é o dispositivo
+Desevolvido um linguagem de programação baseada em C para GPU
+Unifica todas as formas de paralelismo GPU em CUDA_threads
+Segue um modelo de programação SIMT (Single Instruction Multiple Thread)
+
+O que é um core?
+- IU + FPU: GPU type
+- processador SIMD: CPU type
+
+Similaridades com maquinas vetoriais:
+- funciona bem com paralelismo ao nível dos dados
+- transferências scatter-gather
+- Registos mask
+- Ficheiros de registo grandes
+
+Diferenças:
+- Sem processador escalar
+- Usa multithreading para esconder a latência da memória
+- Tem muitas unidades funcionais, ao contrário de unidades com pipelines profundos como um processador vetorial
+
+##### Estrutura na memória numa GPU Nvidia
+Cada SIMD lane tem uma secção privada fora do chip de DRAM
+    - "private memory" (local memory)
+    - contém stack frame, spilling registers e variáveis privadas
+Cada multithreaded SIMD processor (SM-Streaming Multiprocessor) tem também local memory (shared memory)
+    - partilhada por SIMD lanes/threads dentro de um bloco
+Memória partilhada por SIMD processors (SM) é GPU memory, fora do chip DRAM (global memory)
+    - host pode ler e escrever na GPU memory
+![SM](images/SM.png)
+
+ver slides DataParallel2_GPU.pdf a partir do slide 28 de modo a visualizar a evolução da arquitetura das GPU's Nvidia
