@@ -511,14 +511,15 @@ Diferenças:
 - Usa multithreading para esconder a latência da memória
 - Tem muitas unidades funcionais, ao contrário de unidades com pipelines profundos como um processador vetorial
 
-##### Estrutura na memória numa GPU Nvidia
+##### Estrutura da memória numa GPU Nvidia
 Cada SIMD lane tem uma secção privada fora do chip de DRAM
-    - "private memory" (local memory)
-    - contém stack frame, spilling registers e variáveis privadas
+- "private memory" (local memory)
+- contém stack frame, spilling registers e variáveis privadas
 Cada multithreaded SIMD processor (SM-Streaming Multiprocessor) tem também local memory (shared memory)
-    - partilhada por SIMD lanes/threads dentro de um bloco
+- partilhada por SIMD lanes/threads dentro de um bloco
 Memória partilhada por SIMD processors (SM) é GPU memory, fora do chip DRAM (global memory)
-    - host pode ler e escrever na GPU memory
+- host pode ler e escrever na GPU memory
+
 ![SM](images/SM.png)
 
 ver slides DataParallel2_GPU.pdf a partir do slide 28 de modo a visualizar a evolução da arquitetura das GPU's Nvidia
