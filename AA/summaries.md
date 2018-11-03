@@ -1,4 +1,4 @@
-# Resumos
+ Resumos
 
 ## A saber(Revisões)
 
@@ -492,8 +492,11 @@ Evolução das arquiteturas vetoriais/SIMD-extendidas
 - PU's heterogéneos num SoC: multicore PU's com GPU-cores
 
 Modelo de execução heterogéneo: CPU é o host, GPU é o dispositivo
+
 Desevolvido um linguagem de programação baseada em C para GPU
+
 Unifica todas as formas de paralelismo GPU em CUDA_threads
+
 Segue um modelo de programação SIMT (Single Instruction Multiple Thread)
 
 O que é um core?

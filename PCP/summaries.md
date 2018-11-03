@@ -1,6 +1,7 @@
 # Introdução
 
 Evolução das arquiteturas de computadores
+
 ![evolucao.png](images/evolucao.png)
 ![evolucao2.png](images/evolucao2.png)
 
@@ -21,7 +22,9 @@ Evolução das arquiteturas de computadores
 Hyper-threading: fios de execução usados para aumentar o ILP
 
 1 processador = 2 processadores?
+
 Não porque parte dos recursos do processador não são duplicados (i.e., são divididos pelos vários fios de execução)
+
 ![hyper.png](images/hyper.png)
 
 ### Memória partilhada vs memória distribuida (HW)
@@ -31,13 +34,16 @@ Não porque parte dos recursos do processador não são duplicados (i.e., são d
     - As caches reduzem o tráfego no barramento e a latência dos acessos
     - A largura de banda da memória é partilhada $`=>`$ limita a escalabilidade
     - Um valor pode estar replicado em vários sitios $`=>`$ são necessários mecanismos para assegurar a coesão entre as caches dos vários processadores e a memória
+
 ![memP.png](images/memP.png)
 - Memória distribuida
     - Cada processador contém a sua própria memória, existindo uma rede de interligação entre os processadores
     - A largura de banda da memória é proporcional ao número de processadores
+
 ![memD.png](images/memD.png)
 - Sistemas híbridos
     - Acesso não uniforme à memória (NUMA)
+
 ![memH.png](images/memH.png)
 
 ## Desenvolvimento de Aplicações Paralelas
@@ -64,15 +70,19 @@ Partição do problema e dos dados a processar
         - Espaço de endereçamento protegido de outros processos
     - Trocado ao nível do kernel
     - Cada processo tem pelo menos uma thread
+
 ![process.png](images/process.png)
 - Threads
     - Fazem parte do mesmo trabalho
     - Partilham espaço de endereçamento, código, dados e ficheiros
     - Trocado ao nível do kernel ou do utilizador
+
 ![thread.png](images/thread.png)
 
 Task: sequência de instruções (Em Java: Runnable object)
+
 Thread/Processo: execução de contexto para uma tarefa (Em Java: Thread)
+
 Processador/Core: hardware que corre uma thread/processo
 
 Vantagens de threads:
@@ -89,11 +99,15 @@ OOP para o resgate:
 
 # OpenMP
 Usado para programação em memória partilhada.
+
 O modelo de execução é baseado no modelo fork-join de execução paralela
+
 ![forkjoin.png](images/forkjoin.png)
+
 Paralelismo é especificado através de diretivas, adicionadas pelo programador ao código
 
 É responsabilidade do programador assegurar correção e efeciência dos programas paralelos
+
 OpenMp não resolve problemas tais como:
 - Data races, starvation, deadlock ou fraco balanceamento de carga, entre outros
 - Mas oferece rotinas para resolver problemas como por exemplo balanceamento de carga ou consistência da memória
@@ -102,8 +116,11 @@ Por predefinição, o número de atividades paralelas é definido em tempo de ex
 
 ## Modelo de programação
 Um programa OpenMP começa com uma thread(master thread)
+
 Regiões paralelas criam uma equipa de atividades paralelas
+
 Construtores Work-sharing geram trabalho para a equipa processar
+
 Clausulas de partilha de dados especificam como as variáveis são partilhadas dentro de uma região paralela
 
 ## Construtores OpenMP
@@ -172,7 +189,7 @@ Como agora vários sistemas são agora NUMA, a colocação das threads no hardwa
     - A política close de afinidade de threads instrui o ambiente de execução a designar as threads para locais perto do local da thread pai
     - O objetivo da política spread de afinidade de threads é para criar uma distribuição esparsa para uma equipa de T threads entre os P locais da partição do pai.
 Exemplo:
-![affinity.png](affinity.png)
+![affinity.png](images/affinity.png)
 
 ## Array Section (Seccção de array)
 Uma secção de array designa um subset de elementos num array. Pode aparecer apenas em clausulas onde é explicitamente permitido
@@ -185,6 +202,7 @@ Uma secção de array designa um subset de elementos num array. Pode aparecer ap
 
 ## Dependências de Tasks (Task dependencies)
 OpenMP 4.0 permite especificação de dependências de tasks
+
 A cláusula depend reforça restrições adicionais no scheduling de tarefas partilhadas do mesmo pai
 - Dependências estabelecidas apenas entre tasks irmãs 
 - #pragma omp task depend (type:list)
@@ -193,23 +211,28 @@ A cláusula depend reforça restrições adicionais no scheduling de tarefas par
         - out ou inout: a task gerada vai ser uma task dependente de todas as tasks irmãs anteriormente geradas que fazem referência a pelo menos um dos itens da lista com uma cláusula in, out ou inout
     - lista é uma lista de variáveis que pode conter sub arrays
 
-### Dependência de fluxo (RAW - Read After Write)
-### Anti-dependência (WAR - Write After Read)
-### Dependência de Output (WAW - Write After Write)
+Dependência de fluxo (RAW - Read After Write)
+
+Anti-dependência (WAR - Write After Read)
+
+Dependência de Output (WAW - Write After Write)
 
 ## Contrutor taskyield
 Especifica que a task corrente pode ser suspendida em favor da execução de uma task diferente
 
 ## Reduções definidas pelo utilizador
 É agora permitido criar novos operadores de redução, que podem ser usados em clausulas de redução
-![decRed.png](decRed.png)
+
+![decRed.png](images/decRed.png)
 
 ## Construtor de cancelamento
 Ativa o cancelamento da região de enclosão mais interna do tipo especificado (parallel, sections, for, taskgroup)
 
 ## Construtores SIMD
 O construtor simd pode ser aplicado a um loop para indicar que o loop pode ser tranformado num loop SIMD (pode ativar vetorização de loops paralelos ou sequenciais)
+
 O construtor declare simd pode ser aplicado a funções para permitir a criação de uma ou mais versões que podem processar multiplos argumentos usando instruções SIMD de uma única invocação de um loop SIMD (pode indicar ao OpenMP para criar versões de funções que podem ser invocadas através de SIMD lanes)
+
 O construtor loop SIMD especifica um loop que pode ser executados concorrentemente usando instruções SIMD e que essas iterações vão ser também executadas paralelamente por threads da equipa
 
 ver slides PCP4 para Device Constructs, Target Construct e Teams Construct a partir do slide 25
@@ -296,24 +319,34 @@ Formas de paralelismo em Java
 
 ## Apresentação dos resultados
 Apresentar resultados de uma maneira legível (compacta)
+
 Colocar legendas em tabelas e gráficos
+
 Não estrapolar valores
+
 Use incrementos constantes no eixo X e no eixo Y, representar o 0 (ou 1)
+
 Justificar resultados obtidos, investigar valores não esperados
 
 ## Erros comuns
 Não documente ambiente experimental/inclusão de detalhes irrelevantes
+
 Não repetir a experiência
+
 Incluir I/O time
+
 Não considerar overhead de leitura de tempo/resolução
+
 Não aquecer a cache (e JIT no Java)
 
 ## Qual é a definação de desempenho
 Pode ser: tempo de execução, efeciência, escalabilidade, necessidade de memória, troughput, latência, custo do projeto/custo de desenvolvimento, portabilidade, potencial reuso
+
 Medida mais comum em aplicações paralelas: speed-up: tempo sequencial / tempo paralelo
 
 ## Lei de Amdahl
 A componente sequencial de uma aplicação limita o speed-up maximo
+
 $`1/((1-p)+p/s)`$
 - S - número de recursos (cores)
 - P . fração(percentagem) que corre em paralelo
@@ -362,7 +395,9 @@ Conceitos básicos:
 ## MPI (Message Passing Interface)
 
 Standard para passagem de mensagens, resultado de um esforço para fornecer uma maneira de desenvolver aplicações paralelos portáveis (baseado em memória distribuida)
+
 Baseado mo modelo SPMD (o mesmo processo é executado em todas as máquinas), passagem de mensagens com entrega de mensagens por ordem
+
 Implementado como uma biblioteca de funções
 
 Modelo Single Program Multiple Data (SPMD)
