@@ -526,3 +526,107 @@ Memória partilhada por SIMD processors (SM) é GPU memory, fora do chip DRAM (g
 ![SM](images/SM.png)
 
 ver slides DataParallel2_GPU.pdf a partir do slide 28 de modo a visualizar a evolução da arquitetura das GPU's Nvidia
+
+#### CUDA (Compute Unified Device Architecture)
+
+CUDA é um modelo de programação recente desenhado para: um host multi-core com um device many-core, onde device tem grande paralelismo SIMD/SIMT e o host e o device não partilham memória.
+
+CUDA oferece abstração de threads para lidar com SIMD e sincronização & partilha de dados entre pequenos grupos de threads.
+
+Programas em CUDA são escritos em C com extensões.
+
+OpenCL inspirado em CUDA, mas para qualquer vendedor de hardware ou software, modelo de programação essencialmente idêntico.
+
+Um device de computação é um um coprocessador do CPU ou do host, tem a sua própria DRAM(device memory), corre muitas threads em paralelo, é normalmente uma GPU mas pode ser outro tipo de device de processamento paralelo.
+
+Porções de dados paralelos de uma applicação são expressas como kernels do device os quais podem correr em muitas threads - SIMT
+
+Diferenças entre threads GPU e CPU:
+- threads GPU são extremamente leves (muito pequeno overhead de criação, requer um grande banco de registos)
+- GPU precisas 1000s de threads para maxima efeciência (multi-core CPU precisa apenas de alguns)
+
+CUDA integrated CPU + GPU application C program: código C sequencial executa no CPU e código C do kernel paralelo executa em blocks de tread do GPU
+
+Hierarquia:
+- Device => Grids
+- Grid => Blocks
+- Block => Warps
+- Warp => Threads
+
+Um kernel corre em multiplos blocks (SPMD).
+
+Threads numa warp são executadas em lock-step way chamado single-instruction multiple-thread (SIMT)
+
+Uma instrução é executada em múltiplas threads (SIMD), o tamanho da warp define a granularidade do SIMD (32 threads)
+
+Sincronização dentro de um bloco usa a memória partilhada.
+
+Um kernel corre numa grid computacional de blocos de thread, threads partilham global memory.
+
+Cada thread usa ID's para decidir em dados trabalhar
+- ID Block: 1D ou 2D
+- ID Thread: 1D, 2D ou 3D
+
+Um bloco de threads é um lote de threads que podem cooperar por:
+- sincronizar a sua execução com uma barreira
+- partilha de dados efeciente através de uma memória partilhada de baixa latência
+- duas threads de dois blocos diferentes não podem cooperar
+
+Threads de instruções SIMD (Warps)
+- cada uma tem o seu IP
+- o escalonador de threads usa um placar para distribuir
+- não há dependências de dados entre threads
+- threads são organizadas em blocos e executadas em grupos de 32 threads(thread block), blocos são organizados numa grid
+
+O escalonador de blocos de threads escaluna blocos para processadores SIMD (Streaming Multiprocessors)
+
+Dentro de cada processador SIMD:
+- 32 lanes SIMD (thread processors)
+- Grande e de pouca profundidade comparado aos processadores vetoriais
+
+##### CUDA Thread Block
+
+Programador declara Bloco (thread):
+- Tamanho do bloco entre 1 a 512 threads concurrentes
+- forma do bloco: 1D, 2D ou 3D
+- Dimensões de bloco em threads
+
+Todas as threads num bloco executam o mesmo programa.
+
+Threads partilham dados e sincronizam enquanto fazem a sua parte do trabalho.
+
+Threads tem um id dentro do bloco.
+
+Programa usa o id para selecionar trabalho e endereço de dados partilhados
+
+##### Partilha Paralela de Memória
+
+Local Memory: (por thread)
+- privada por thread
+- variáveis automáticas, register spill
+Shared Memory: (por bloco)
+- Partilhada pelas threads do mesmo bloco
+- Comunicação entre threads
+Global Memory: (por aplicação)
+- Partilhada por todas as threads
+- Comunicação entre grids
+
+##### Visão geral do modelo de memória CUDA
+
+Cada thread pode:
+- R/W registos por thread
+- R/W local memory por thread
+- R/W shared memory por bloco
+- R/W global memory por grid
+- Read only constant memory por grid
+- Read only texture memory por grid
+
+O host pode R/W global, constant e texture memories.
+
+Memória do Device (DRAM):
+- Lenta (2~300 ciclos)
+- Local, global, constant e texture memory
+
+Memória no chip:
+- Rápida (1 ciclo)
+- Registos, shared memory, constant/texture cache
