@@ -604,9 +604,11 @@ Programa usa o id para selecionar trabalho e endereço de dados partilhados
 Local Memory: (por thread)
 - privada por thread
 - variáveis automáticas, register spill
+
 Shared Memory: (por bloco)
 - Partilhada pelas threads do mesmo bloco
 - Comunicação entre threads
+
 Global Memory: (por aplicação)
 - Partilhada por todas as threads
 - Comunicação entre grids
