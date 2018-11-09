@@ -431,3 +431,66 @@ Modelo Single Program Multiple Data (SPMD)
     - Overhead: Tempo de transferência de mensagem (cópia na rede, transmissão de rede, entrega no buffer do receptor)
 
 Ver slides CP4 a partir do slide 8 para as restantes funcionalidades
+
+# Middleware de Aplicações Paralelas/Distribuídas
+
+Principais aspetos a gerir pelo Middleware
+- Como comunicam as entidades (objetos, componentes ou processos)?
+- Como são identificadas as entidades?
+- Qual o ciclo de vida das entidades (como são criadas e destruídas)?
+
+## Comunicação entre entidades
+- Invocação direta de métodos ou procedimentos em aplicações não distribuidas: podem ser implementadas através de um salto para o endereço correspondente ao método/procedimento a realizar, sendo os parametros passados na pilha ou em registos do processador
+- Primitivas do tipo send(host, port, message) e recv([host],port):
+    - Em aplicações distribuídas clássicas, baseadas em processos, as entidades podem comunicar através da passagem de mensagens, por exemplo, utilizando primitivas do tipo send e recv
+    - A primitiva send pode ser implementada através do envio de um pacote de informação ao host indicado, contendo a identificação do destinatário (e.g., port) e a mensagem
+    - No recetor é necessário ativar o processo recetor à espera da mensagem e este deve extrair a mensagem do pacote de informação recebido
+- Invocação remota de métodos
+    - Geralmente utilizado em aplicações distribuídas desenvolvidas através de componentes ou objetos
+    - Pode ser implementado "colando" um procurador (stub) junto do cliente, procurador que implementa a mesma interface que o objeto ou componente remoto e que o substitui de forma transparente. Este stub converte cada invocação de método numa mensagem enviada ao objeto remoto
+    - Junto ao objeto remoto existe um tie que descodifica a mensagem e invoca o método correspondente no objeto local
+![RMI](images/RMI.png)
+
+## Identificação das entidades
+Em aplicações não distribuídas, uma entidade pode ser identificada diretamente pelo seu endereço de memória(referência).
+
+Em aplicações distribuídas pode ser realizada através de:
+- um par (máquina, endereço) ou (máquina, porta)
+- um servidor de nomes que permite a utilização de nomes abstratos para identificar as entidades. Cada entidade pode registar-se nesse servidor de nomes, o qual é utilizado pelos clientes para obter referências para entidades registadas
+
+O esquema de identificação das entidades deve ser universal, de forma a ser possível passar os identificadores entre máquinas
+- Entidades de primeira classe: podem ser copiadas e passadas como parametros de métodos
+
+## Ciclo de vida das entidades
+- Para que uma entidade (objeto, componente ou processo) seja criado numa máquina é necessário que o executável correspondente se encontre nessa máquina ou que seja descarregado juntamente com o pedido de criação (processo conhecido por deployment)
+- A criação de entidades pode ser efetuada de forma manual (correndo o executável na máquina remota), ou utilizando uma fábrica de entidades. Neste último caso é necessário ativar a fábrica
+- Podem existir várias fábricas de objetos (nomeadamente, uma por classe, em cada nodo), sendo necessário introduzir um serviço para localizar as várias fábricas
+- A destruição automática dos objetos em aplicações distribuídas é mais complexa, uma vez que é necessária comunicação entre os diversos nodos para efetuar a contagem das referências existentes
+
+## MPI vs RMI
+![MPIvsRMI](images/MPIvsRMI.png)
+
+## Exemplos de Middleware
+- PVM(Parallel Virtual Machine) e MPI(Message Passing Interface)
+    - o envio e a receção de mensagens entre processos (na mesma máquina ou em máquinas diferentes) 
+    - primitivas para o envio e receção de mensagens (síncronas/assíncronas e bloqueantes e não bloqueantes)
+    - identificação é realizada através de portas, existindo primitivas para dinamicamente lançar um processo remoto(PVM)
+- CORBA(Common Object Request Broker Architecture)
+    - arquitetura que permite a inter-operabilidade de componentes
+    - baseada na definição de interfaces de componentes (IDL-Interface Definition Language) e num serviço de nomes que permite localizar componentes e invocar métodos (ORB-Object Request Broker)
+    - a inter-operabilidade é assegurada através da utilização de um protocolo de comunicação baseado em TCP/IP (IIOP - Internet Inter-ORB Protocol), que define a forma como a informação que é trocada entre ORB's
+- Java RMI e Java RMI-IIOP: permite a invocação de métodos entre objetos Java distribuídos. O serviço de nomes pode ser fornecido pelo RMI Registry ou por JNDI(Java Naming and Directory Interface). RMI-IIOP utiliza protocolos compatíveis com CORBA
+- J2EE (Java 2 Enterprise Edition): especificação para desenvolvimento de aplicações empresariais baseadas em componentes(Enterprise Java Beans), distribuídos e com várias camadas. Suporta o desenvolvimento de componentes para a apresentação (JSP e Servlets), para a camada de computação (Session Beans) e para a camada de BD (Entity Beans). Suporta ainda transações, segurança com autenticação, e passagem de mensagens
+- .NET Remoting: alternativa da Microsoft ao desenvolvimento de aplicações empresariais distribuídas. Incluída na plataforma .NET, suporta a invocação remota de métodos e a gestão do ciclo de vida de objetos distribuídos
+
+## Java RMI/IIOP
+Middleware utilizado para efetuar invocações de métodos entre objetos em diferentes JVM ou em componentes compatíveis com CORBA.
+
+Cada objeto servidor deve exportar uma ou várias interfaces, existindo um utilitário rmic para explicitamente gerar o stub e o tie.
+
+O objeto servidor regista-se no serviço de nomes (JNDI) com um nome abstrato, sendo esse serviço utilizado pelos clientes para obterem uma referência ao objeto remoto.
+
+O deployment é manual, existindo um protocolo que permite que os objetos servidores sejam descarregados e ativados automaticamente (derivando da classe Activable).
+
+Na invocação remota de métodos, os objetos declarados como remotos são passados por referência, enquanto os outros objetos são sempre por valor:
+![JavaRMI](images/JavaRMI.png)
