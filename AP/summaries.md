@@ -28,9 +28,10 @@ São mais fáceis de paralelizar e de obter ganhos os algoritmos que são maus e
 (x,y)
 0 \leq x \leq 1
 \sqrt{x^2 + y^2} \leq 1
-``` então:
-        1 - está dentro do quarto de círculo
-        2 - senão está fora
+``` 
+então:
+1. está dentro do quarto de círculo
+2. senão está fora
 
 Quadrado é circunscrito ao círculo.
 
