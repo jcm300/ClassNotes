@@ -1,3 +1,5 @@
+# Paradigmas de Computação Paralela
+
 # Introdução
 
 Evolução das arquiteturas de computadores
