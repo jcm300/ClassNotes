@@ -2,7 +2,7 @@
 
 Algoritmos que envolvem apenas o __Paradigma de Memória Distribuída__.
 
-Os melhores algoritmos para paralelizar são os que apresentam complexidade: O($`N^3`$), O($`N!$`), ou seja, com grande complexidade (problemas NP-completos).
+Os melhores algoritmos para paralelizar são os que apresentam complexidade: O($`N^3`$), O($`N!`$), ou seja, com grande complexidade (problemas NP-completos).
 
 A resolução de problemas por métodos diretos tem complexidade O($`N`$) e os métodos iterativos tem complexidade O($`N^3`$).
 
@@ -27,10 +27,11 @@ São mais fáceis de paralelizar e de obter ganhos os algoritmos que são maus e
 ```math
 (x,y)
 0 \leq x \leq 1
-\sqrt{x^2 + y^2} \leq 1 então:
-                            1 - está dentro do quarto de círculo
-                            2 - senão está fora
-```
+\sqrt{x^2 + y^2} \leq 1
+``` então:
+        1 - está dentro do quarto de círculo
+        2 - senão está fora
+
 Quadrado é circunscrito ao círculo.
 
 Quantos mais "tiros" tendencionalmente melhor será a aproximação ao $`\pi`$
@@ -75,6 +76,7 @@ rota inicial aletória (O($`N!`$))
 depois:
 
 São feitas melhorias locais aleatoriamente até não se conseguir obter ganhos ao fim de x ciclos:
+
 ![MonteCarloMethod](images/monteCarlometh.png)
 
 ## Fenómeno de Marsaglia
