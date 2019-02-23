@@ -2,7 +2,7 @@
 
 Class notes and summaries
 
-Used [GitLab-flavored Markdown](https://docs.gitlab.com/ee/user/markdown.html#gitlab-flavored-markdown-gfm) for Markdown files.
+Used [GitLab Flavored Markdown](https://docs.gitlab.com/ee/user/markdown.html#gitlab-flavored-markdown-gfm) for Markdown files.
 
 Menu:
 - [Arquiteturas Avançadas](AA/summaries.md)
