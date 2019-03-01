@@ -125,3 +125,219 @@ Técnica probabilistica para aproximar o ótimo global de uma determinada funç�
 Algoritmo:
 
 Em cada iteração do algoritmo, um novo ponto é gerado aleatoriamente. A distância do novo ponto a partir do ponto atual, ou a extensão da pesquisa, é baseada em uma distribuição de probabilidade com uma escala proporcional à "temperatura". O algoritmo aceita todos os novos pontos que baixam o objetivo, mas também, com certa probabilidade, pontos que aumentam o objetivo. Ao aceitar pontos que aumentam o objetivo, o algoritmo evita ficar preso em mínimos locais nas primeiras iterações e é capaz de explorar globalmente as melhores soluções.
+
+Caso do caixeiro viajante usando Monte Carlo com Simulated Annealing:
+
+```matlab
+function [Tdist,town]=traveling(D)
+% function [Tdist,town]=traveling(x,y,D)
+% uses simulated annealing to solve the Traveling Salesman Problem: given n
+% towns and the distances between any two of them, finds the shortest route 
+% that starts at one of the towns, goes once through everyone of the others 
+% and returns to the first one
+
+n=length(D);
+% FIRST tentative route 
+town=randperm(n);           % a random permutation of the first n integers 
+Tdist=D(town(n),town(1));
+for i=1:n-1                               % length of 
+    Tdist=Tdist+D(town(i),town(i+1));     % initial route
+end
+
+T=1;     % initial temperature
+i=0;
+while i < 100           % stop if no changes for 100 iterations
+    c=randi(n);         % randomly chooses a town (at position c in route)
+    if c==1             % and swaps its position with the next one
+        previous=n; next1=2; next2=3;
+    elseif c==n-1
+        previous=n-2; next1=n; next2=1;
+    elseif c==n
+        previous=n-1; next1=1; next2=2;
+    else
+        previous=c-1; next1=c+1; next2=c+2;
+    end
+    % delta=increment in length of route
+    delta=D(town(previous),town(next1))+D(town(c),town(next2))-D(town(previous),town(c))-D(town(next1),town(next2)); 
+    % accept or discard change to route 
+    if delta<0 | (exp(-delta/T)>= rand) %if delta<0 | (T>0.001 & (exp(-delta/T)>= rand))?
+        temp=town(c); town(c)=town(next1); town(next1)=temp; % swap order of town(c) and town(c+1) in route                 
+        Tdist=Tdist+delta; 
+        if delta~=0
+            i=0;
+        end
+    else i=i+1;
+    end
+    T=0.999*T;
+end
+```
+
+## BLAS (Basic Linear Algebra Subprograms)
+
+Níveis:
+- BLAS 1: (vetor x vetor)
+  - dados : O($`N`$)
+  - FLOPS : O($`N`$)
+  - Ex: $`\sum_{i=1}^{n} x_i * y_i`$ ($`n`$ produtos + $`n-1`$ adições)
+- BLAS 2: (matriz x vetor)
+  - dados : O($`N^2`$)
+  - FLOPS : O($`N^2`$) 
+  - Ex: $`A . x`$ ou seja, para $`i=1:n`$, $`\sum_{j=1}^{n} A(i,j) * x_j`$ ($`n^2`$ produtos + $`n(n-1)`$ adições)
+- BLAS 3: (matriz x matriz)
+  - dados : O($`N^2`$)
+  - FLOPS : O($`N^3`$)
+  - Ex: $`A.B`$ ($`n^3`$ produtos + $`n^2(n-1)`$ adições) 
+
+Os kernels em cada nível são divididos em (começam por):
+- S : precisão simples
+- D : precisão dupla
+- C : precisão simples de números complexos
+- Z : precisão dupla de números complexos
+
+LAPACK (Linear Algebra PACKage) = LINPACK + EISPACK
+
+### Kernel saxpy
+
+Fórmula: $`y \leftarrow y + a.x`$
+
+Ex:
+
+$`
+\begin{bmatrix}
+    a_{11} & a_{12} & a_{13} \\[0.3em]
+    a_{21} & a_{22} & a_{23} \\[0.3em]
+    a_{31} & a_{32} & a_{33}
+\end{bmatrix}
+.
+\begin{bmatrix}
+    x_1 \\[0.3em]
+    x_2 \\[0.3em]
+    x_3
+\end{bmatrix}
+= \begin{bmatrix}
+    a_{11}.x_1 + a_{12}.x_2 + a_{13}.x_3 \\[0.3em]
+    a_{21}.x_1 + a_{22}.x_2 + a_{23}.x_3 \\[0.3em]
+    a_{31}.x_1 + a_{32}.x_2 + a_{33}.x_3
+\end{bmatrix}
+\Rightarrow
+x_1.
+\begin{bmatrix}
+    a_{11} \\[0.3em]
+    a_{21} \\[0.3em]
+    a_{31}
+\end{bmatrix}
++ 
+x_2 . 
+\begin{bmatrix}
+    a_{12} \\[0.3em]
+    a_{22} \\[0.3em]
+    a_{32}
+\end{bmatrix}
++
+x_3 .
+\begin{bmatrix}
+    a_{13} \\[0.3em]
+    a_{23} \\[0.3em]
+    a_{33}
+\end{bmatrix}
+`$
+
+### Uso de blocos
+
+$`
+\left[
+\begin{array}{cc|cc}
+    a_{11} & a_{12} & a_{13} & a_{14} \\[0.3em]
+    a_{21} & a_{22} & a_{23} & a_{24} \\[0.3em]
+    \hline
+    a_{31} & a_{32} & a_{33} & a_{34} \\[0.3em]
+    a_{41} & a_{42} & a_{43} & a_{44}
+\end{array}
+\right]
+.
+\left[
+\begin{array}{cc|cc}
+    b_{11} & b_{12} & b_{13} & b_{14} \\[0.3em]
+    b_{21} & b_{22} & b_{23} & b_{24} \\[0.3em]
+    \hline
+    b_{31} & b_{32} & b_{33} & b_{34} \\[0.3em]
+    b_{41} & b_{42} & b_{43} & b_{44}
+\end{array}
+\right]
+= \begin{bmatrix}
+    C_{11} & C_{12} \\[0.3em]
+    C_{21} & C_{22}
+\end{bmatrix}
+`$
+
+$`
+\begin{bmatrix}
+    A_{11} & A_{12} \\[0.3em]
+    A_{21} & A_{22} 
+\end{bmatrix}
+.
+\begin{bmatrix}
+    B_{11} & B_{12} \\[0.3em]
+    B_{21} & B_{22} 
+\end{bmatrix}
+= \begin{bmatrix}
+    C_{11} & C_{12} \\[0.3em]
+    C_{21} & C_{22}
+\end{bmatrix}
+`$
+
+$`
+C_{11} = A_{11} . B_{11} + A_{12} . B_{21} \\
+... \\
+(NxN)\ com\ N = \frac{n}{p}\ em\ que\ n=ordem\ da\ matrix
+`$
+
+## Google Matrix
+
+A Google matrix é uma matriz estocástica particular que é usada pelo algoritmo PageRank da Google. A matrix representa um grafo com arestas a representar os links entre páginas (websites). Esta matriz é uma matriz de adjacência esparsa. 
+
+### PageRank
+
+PageRank é um algoritmo usado pelo Google Search para rankear as páginas web nos resultados obtidos pelo motor de busca da Google.
+
+O PageRank de forma a calcular uma estimativa do rank de (quão importante é) uma página, conta o número e a qualidade dos links para a página. O pressuposto subjacente é que sites mais importantes provavelmente receberão mais links de outros sites.
+
+## Algoritmos "Matrix-free"
+
+É um algoritmo para resolver um sistema linear de equações ou um problema de eigenvalue, que não armazena a matriz de coeficientes explicitamente, mas acede a matriz avaliando produtos vetoriais de matriz. Tais algoritmos podem ser preferíveis quando a matriz é tão grande que armazená-la e manipulá-la custaria muito tempo de memória e de computador, mesmo com o uso de métodos para matrizes esparsas.
+
+Muitos algoritmos iterativos permitem uma implementação matrix-free entre eles:
+ - Método de potência
+ - Algoritmo Lanczos 
+ - LOBPCG (Locally Optimal Block Preconditioned Conjugate Gradient Method)
+ - Algoritmo de recorrência coordenada de Wiedemann 
+ - Método do gradiente conjugado 
+
+Soluções distribuídas têm sido também exploradas usando sistemas de software paralelos coarse-grain de modo a alcançar soluções homogéneas de sistemas lineares.
+
+## Matriz Banda
+
+$`a_{ij} = 0\ se\ |i-j|>k\ (k<<n)`$
+
+Um caso particular é a matriz tridiagonal (k=1).
+
+### Matriz Tridiagonal
+
+Uma matriz tridiagonal é uma matriz banda que apenas não tem zeros na diagonal principal, na primeira diagonal abaixo e na primeiro diagonal acima da diagonal principal.
+
+Ex:
+
+$`
+\begin{pmatrix}
+    a_{11} & a_{12} & \cdots    & 0 \\
+    a_{21} & a_{22} & \ddots    & \vdots \\
+    \vdots & \ddots & \ddots    & a_{n-1,n}\\
+    0      & \cdots & a_{n,n-1} & a_{nn} 
+\end{pmatrix}
+`$
+
+## Algoritmo de Strassen/Volker Strassen
+
+É um algoritmos para multiplicação de matrizes. É mais rápido que o algoritmo padrão para a multiplicação de matrizes e é util na prática para matrizes grandes, mas seria mais lento que os algoritmos mais rápidos conhecidos para matrizes extremamente grandes.
+
+Complexidade assintótica: O($`N^{2.8074}`$)
