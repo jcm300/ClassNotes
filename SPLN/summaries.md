@@ -170,13 +170,13 @@ cat /dev/urandom | tr -dc "0-9a-zA-Z!@#$%^&*_+-" | head -c 100 # gera 100 caract
 ```python
 import subprocess
 
-exit_code = subprocess.call([”ls”, ”-l”])
+exit_code = subprocess.call(["ls", "-l"])
 
 # retorna output como byte string
-output = subprocess.check_output(’ifconfig’)
+output = subprocess.check_output('ifconfig')
 
 # uso da função decode() para converter byte string para string
-print(returned_output.decode(”utf-8”))
+print(returned_output.decode("utf-8"))
 ```
 
 ### Criar um filtro Unix em Python
