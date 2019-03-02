@@ -1,7 +1,5 @@
 # Processamento e Representação de Conhecimento
 
-TODO: ler slides Linked Data Engineering
-
 ## Linked Open Data
 
 É um método de publicação de dados estruturados para que possam ser interligados e tornarem-se mais utéis através de queries semânticas.
@@ -135,7 +133,7 @@ No caso de queries que lêm dados da base de dados o SPARQL especifica quatro va
 
 Cada um desses formatos usa um bloco WHERE para restringir a consulta, embora, no caso da consulta DESCRIBE, o WHERE seja opcional.
 
-Para além disso após o WHERE é possível usar blocos tais como LIMIT, GROUP BY, etc. Na query pode ser usado por exemplo o count.
+Para além disso após o WHERE é possível usar blocos tais como LIMIT, GROUP BY, ORDER BY etc. Na query pode ser usado por exemplo o COUNT, DISTINCT, etc.
 
 TODO: Completar
 
