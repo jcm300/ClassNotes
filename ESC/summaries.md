@@ -10,6 +10,8 @@ C7: 57
 
 TODO: LER apontamentos da aula
 
+TODO: LER slides
+
 ## Chapter 1 - Introdução
 
 ### Systems Performance
