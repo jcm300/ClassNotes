@@ -324,3 +324,66 @@ re.sub(r'\w+', lambda x: pt_en.get(x[0], x[0]), text)
 for x in re.findall(pattern, string):
     # do stuff
 ```
+
+## Precisão e recall
+
+### Avaliação
+
+- Comparação com um dataset de referência
+- No desenvolvimento do tipo de aplicações desta área, o dataset é normalmente dividido em (pelo menos) dois subsets:
+    - treino
+    - avaliação
+
+### Precisão (Accuracy)
+
+$`precisão = \frac{corretas}{total}`$
+
+ou
+
+$`precisão = \frac{true\ positives}{true\ positives + false\ positives}`$
+
+### Matriz de Confusão (Confusion Matrix)
+
+![ConfusionMatrix](images/confusionMatrix.png)
+
+### Recall
+
+Expressa a capacidade de encontrar todas as instâncias releventes.
+
+$`recall = \frac{true\ positives}{true\ positives + false\ negatives}`$
+
+### $`F_1`$ Score
+
+Média armónica entre precisão e recall
+
+$`F_1 = 2 * \frac{precisão * recall}{precisão + recall}`$
+
+### Trade-off entre precisão e recall
+
+Classificadores geralmente fornecem valores de probabilidade. Exemplo: “I’m 8/10 sure Bruno is a first name”
+
+O trade-off entre precisão e recall pode ser ajustado alterando o valor de corte. Exemplo: “Consider first names entities with a likelyhood value over 0.7”
+
+### TPR e FPR
+
+$`True\ Positive\ Rate = \frac{true\ positives}{true\ positives + false\ negatives}`$
+
+$`False\ Positive\ Rate = \frac{false\ positives}{false\ positives + true\ negatives}`$
+
+### Curva ROC (Receiver Operating Characteristic)
+
+Exemplo:
+
+![curvaROC](images/curvaROC.png)
+
+#### AUC (Area Under the Curve)
+
+Mede a àrea debaixo da curva ROC.
+
+Permite comparações independentes dos pontos de corte escolhidos.
+
+### Limitações
+
+Indisponibilidade de conjuntos de dados de referência: precisão ainda pode ser mensurável.
+
+Às vezes, não é claro o que pode ser considerado falso positivo ou falso negativo.

@@ -2,10 +2,6 @@
 
 TODO: LER LIVRO: Systems Performance - Enterprise and the Cloud, Capítulos 1,2,3,4 e 7
 
-C1: 14
-
-C2: 69
-
 C3: 30
 
 C4: 38
@@ -407,6 +403,260 @@ Estas medem a taxa de pedidos e o desempenho resultante.
 
 #### USE Method
 
-TODO
+O método de utilização, saturação e erros (USE) deve ser usado no início de uma investigação de desempenho para identificar bottlenecks sistêmicos. Pode ser resumido desta maneira:
 
-TODO: Ver se vale apena falar dos outros métodos
+"Para cada recurso, verificar a utilização, a saturação e os erros."
+
+- Resource: todos os componentes funcionais do servidor físico. Alguns recursos de software também podem ser examinados, desde que as métricas façam sentido.
+- Utilização: para um intervalo de tempo definido, a percentagem de tempo em que o recurso esteve ocupado a realizar o serviço. Enquanto ocupado, o recurso ainda pode aceitar mais trabalho; o grau em que isso não pode ser feito é identificado pela saturação.
+- Saturação: o grau em que o recurso tem trabalho extra que não pode servir, ficando à espera numa fila.
+- Errors: a contagem de eventos de erro.
+
+Para alguns tipos de recursos, a utilização é a capacidade do recurso utilizado. Isso é diferente da definição baseada em tempo. Quando um recurso de capacidade atinge 100% de utilização, mais trabalho não pode ser aceite e o recurso coloca em queue o trabalho (saturação) ou retorna erros, que também são identificados usando o método USE.
+
+Os erros devem ser investigados porque podem degradar o desempenho e podem não ser notados imediatamente quando o modo de falha é recuperável. Isso inclui operações que falham e são repetidas e dispositivos que falham em um pool de dispositivos redundantes.
+
+O método USE envolve a iteração de recursos do sistema em vez de ferramentas. Ajuda a criar uma lista completa de perguntas a serem feitas, e só então se procura por ferramentas para respondê-las. Mesmo quando as ferramentas não podem ser encontradas para responder às perguntas, o conhecimento de que essas perguntas não foram respondidas pode ser extremamente útil para o analista de desempenho: elas agora são "known-unknowns".
+
+O método USE também direciona a análise para um número limitado de métricas-chave, para que todos os recursos do sistema sejam verificados o mais rápido possível. Depois disso, se nenhum problema tiver sido encontrado, outras metodologias poderão ser usadas.
+
+##### Procedimento
+
+![Procedimento](images/procedimento.png)
+
+Os erros são colocados primeiro antes que a utilização e a saturação sejam verificadas. Os erros geralmente são rápidos e fáceis de interpretar, e pode ser eficiente em termos de tempo eliminá-los antes de investigar as outras métricas.
+
+Este método identifica problemas que provavelmente são bottlenecks do sistema. Infelizmente, um sistema pode estar a sofrer de mais do que um problema de desempenho, então a primeira coisa que você encontra pode ser um problema, mas não o problema. Cada descoberta pode ser investigada usando metodologias adicionais, antes de retornar ao método USE, conforme necessário, para iterar mais recursos.
+
+###### Expressando métricas
+
+As métricas do método USE geralmente são expressas da seguinte maneira:
+- Utilização: como uma percentagem ao longo de um intervalo de tempo
+- Saturação: como um comprimento da fila de espera
+- Erros: número de erros reportados
+
+Um curto período de alta utilização pode causar problemas de saturação e desempenho, mesmo que a utilização geral seja baixa durante um longo intervalo. Algumas ferramentas de monitorização relatam a utilização em médias de 5 minutos.
+
+###### Lista de recursos
+
+O primeiro passo no método USE é criar uma lista de recursos. Tente ser o mais completo possível.
+
+Cada componente geralmente age como um tipo de recurso único. Alguns componentes podem comportar-se como vários tipos de recursos. Considere todos os tipos que podem levar a bottlenecks de desempenho.
+
+Alguns componentes físicos podem ser deixados de fora da sua lista de verificação. O método USE é mais eficaz para recursos que sofrem degradação de desempenho sob alta utilização ou saturação, levando a bottlenecks, enquanto os caches melhoram o desempenho sob alta utilização. Estes podem ser verificados usando outras metodologias. Se você não tiver certeza de incluir um recurso, inclua-o e veja como as métricas funcionam na prática.
+
+###### Diagrama de Blocos Funcionais
+
+Outra maneira de iterar recursos é encontrar ou desenhar um diagrama de blocos funcional para o sistema. Este diagrama também mostra relações, que podem ser muito úteis ao procurar por bottlenecks no fluxo de dados.
+
+Exemplo:
+
+![DiagramaBlocos](images/diagramaBlocos.png)
+
+CPU, memória, interconexões de I/O e busses são frequentemente ignorados. Felizmente, eles não são bottlenecks comuns do sistema, pois são normalmente projetados para fornecer um excesso de throughput. Infelizmente, se forem o problema pode ser difícil de resolver.
+
+###### Métricas
+
+Depois de ter a lista de recursos, considera-se as métricas: utilização, saturação e erros.
+
+Repita para todas as combinações e inclua instruções para buscar cada métrica.
+Tome nota das métricas que não estão disponíveis atualmente, estes são os known-unknowns. No fim ter-se-á uma lista de cerca de 30 métricas, algumas das quais são difíceis de avaliar e algumas não podem ser medidas. Felizmente, os problemas mais comuns geralmente são encontrados com as métricas mais fáceis portanto, essas devem ser verificadas primeiro.
+
+Algumas delas podem não estar disponíveis nas ferramentas padrão do sistema operativo e podem requerer o uso de dynamic tracing ou o recurso a contadores de desempenho do CPU.
+
+###### Recursos de Software
+
+Alguns recursos de software podem ser examinados da mesma forma que os recursos físicos. Isto geralmente aplica-se a componentes menores de software, não aplicações inteiras, por exemplo:
+- Mutex locks: A utilização pode ser definida como o tempo em que o lock foi mantido, a saturação será as threads em queue à espera do lock.
+- Thread pools: A utilização pode ser definida como o tempo em que as threads estavam ocupadas a processar trabalho, a saturação pelo número de pedidos à espera de serem servidos pela thread pool.
+- Process/thread capacity: O sistema pode ter um número limitado de processos ou threads, cujo uso atual pode ser definido como utilização; a espera na alocação pode ser saturação; e erros são quando a alocação falha.
+- File descriptor capacity: semelhante à capacidade de process/thread, mas para descritores de ficheiros.
+
+Se as métricas funcionam bem no seu caso, use-as, caso contrário, metodologias alternativas, como a análise de latência, podem ser aplicadas.
+
+###### Interpretações Sugeridas
+
+Aqui estão algumas sugestões gerais para interpretar as métricas:
+- Utilização: A utilização a 100% é geralmente um sinal de um bottleneck (verificar a saturação 
+e o seu efeito para confirmar). A utilização acima de 60% pode ser um problema por alguns motivos: dependendo do intervalo, pode ocultar rajadas curtas de 100% de utilização. Além disso, alguns recursos, como discos rígidos, geralmente não podem ser interrompidos durante uma operação, mesmo para trabalhos de prioridade mais alta. À medida que a utilização aumenta, os atrasos nas filas tornam-se mais frequentes e notáveis.
+- Saturação: Qualquer grau de saturação pode ser um problema (diferente de zero). Pode ser medido como o tamanho de uma fila de espera ou como tempo gasto à espera na fila.
+- Erros: Contadores de erros diferentes de zero merecem ser investigados, especialmente se aumentarem quando o desempenho é mau.
+
+É fácil interpretar os casos negativos: baixa utilização, sem saturação, sem erros. Isto é mais útil do que parece, restringe o scope de uma investigação que pode ajudar a concentrar rapidamente na área do problema, identificado que provavelmente não é um problema de recursos. Este é o processo de eliminação.
+
+###### Cloud Computing
+
+Num ambiente de cloud computing, os controlos dos recursos de software podem estar presentes para limitar ou limitar os inquilinos que compartilham um sistema. Cada um desses limites de recursos podem ser examinados com o método USE, da mesma forma que o exame aos recursos físicos.
+
+### Modelação
+
+A modelação analítica de um sistema pode ser usada para vários propósitos, em particular analisar a escalabilidade: estudando como o desempenho é dimensionado conforme a carga ou a escala de recursos.
+
+A modelação analítica pode ser considerada como o terceiro tipo de atividade de avaliação de desempenho, juntamente com a observação de um sistema de produção e teste experimental. O desempenho é melhor compreendido quando pelo menos duas dessas atividades são realizadas: modelação analítica e simulação, ou simulação e medição.
+
+Se a análise for para um sistema existente, pode-se começar com a medição: caracterizando a carga e o desempenho resultante. A análise experimental, testando uma simulação de carga de trabalho, pode ser usada se o sistema ainda não tiver carga de produção ou para testar cargas de trabalho acima do que é visto em produção. A modelação analítica pode ser usada para prever o desempenho e pode ser baseada nos resultados de medição ou simulação.
+
+A análise de escalabilidade pode revelar que o desempenho para de ser linear num determinado ponto, chamado de knee point, devido a uma restrição de recursos.
+
+#### Enterprise versus Cloud
+
+Embora a modelação permita-nos simular sistemas corporativos de larga escala sem a despesa de possuir um, o desempenho de ambientes de grande escala é frequentemente complexo e difícil de modelar com precisão.
+
+Com cloud computing, ambientes de qualquer escala podem ser alugados por curtos períodos de tempo. Em vez de criar um modelo matemático para prever o desempenho, a carga de trabalho pode ser caracterizada, simulada e depois testada em nuvens de diferentes escalas. Algumas das descobertas, como os knee points, podem ser as mesmas, mas agora serão baseadas em dados medidos e não em modelos teóricos, e ao testar num ambiente real, pode-se descobrir limitadores que não foram incluídos no modelo.
+
+#### Identificação Visual
+
+Quando suficientes resultados podem ser obtidos experimentalmente, ao desenhá-los como desempenho obtido versus um parâmetro de escala pode revelar um padrão.
+
+Há vários perfis de escalabilidade, que podem ser identificados visualmente, sem usar um modelo formal:
+
+![perfisEsca](images/perfisEsca.png)
+
+Para cada um, o eixo x é a dimensão de escalabilidade e o eixo y é o desempenho resultante. Os padrões são:
+- Escalabilidade linear: o desempenho aumenta proporcionalmente à medida que o recurso é dimensionado. Isto pode não continuar para sempre e, em vez disso, pode ser o estágio inicial de outro padrão de escalabilidade.
+- Contenção: Alguns componentes da arquitetura são compartilhados e podem ser usados somente em série, e a contenção desses recursos compartilhados começa a reduzir a eficácia da escalabilidade.
+- Coerência: O imposto para manter a coerência dos dados, incluindo a propagação de alterações, começa a superar os benefícios da escalabilidade.
+- Ponto Joelho (knee point): Um factor é encontrado num ponto de escalabilidade que altera o perfil de escalabilidade.
+- Teto de escalabilidade: um limite rígido é atingido. Isto pode ser um bottleneck de um dispositivo, como um bus ou interconexão, ao atingir o throughput máximo ou um limite imposto pelo software.
+
+Embora a identificação visual possa ser fácil e eficaz, pode-se aprender mais sobre a escalabilidade do sistema usando um modelo matemático. O modelo pode desviar-se dos dados de uma forma inesperada, o que pode ser útil para investigar: ou há um problema com o modelo ou o problema está na escalabilidade real do sistema.
+
+#### Lei de Escalabilidade de Amdahl
+
+Esta lei modela a escalabilidade do sistema, respondendo por componentes serializados de cargas de trabalho que não escalam em paralelo. Ela pode ser usada para estudar a escalabilidade de CPUs, threads, cargas de trabalho e muito mais.
+
+Pode ser definido como:
+
+$`C(N) = \frac{N}{1} + \alpha(N - 1)`$
+
+A capacidade relativa é $`C(N)`$ e $`N`$ é a dimensão da escalabilidade. O parâmetro $`\alpha`$ (onde $`0 \leq \alpha \leq 1`$) representa o grau de serialidade e como isto se desvia da escalabilidade linear.
+
+A Lei de Escalabilidade de Amdahl pode ser aplicada seguindo os seguintes passos:
+- Coletar dados para um intervalo de $`N`$, seja por observação de um sistema existente ou experimentalmente usando micro-benchmarking ou geradores de carga.
+- Realizar análise de regressão para determinar o parâmetro Amdahl ($`\alpha`$); isto pode ser feito usando software estatístico, como gnuplot ou R.
+- Apresentar os resultados para análise. Os pontos de dados recolhidos podem ser desenhados junto com a função do modelo para prever a escalabilidade e revelar diferenças entre os dados e o modelo. Isto também pode ser feito usando gnuplot ou R.
+
+#### Lei Universal de Escalabilidade
+
+A Universal Scalability Law (USL) foi desenvolvida para incluir um parâmetro para o atraso da coerência.
+
+USL pode ser definido como:
+
+$`C(N) = \frac{N}{1} + \alpha (N - 1) + \beta N(N - 1)`$
+
+$`C(N)`$, $`N`$ e $`\alpha`$ são como na Lei de Escalabilidade de Amdahl. $`\beta`$ é o parâmetro de coerência. Quando $`\beta == 0`$, esta lei torna-se na Lei de Escalabilidade de Amdahl.
+
+#### Teoria das Filas
+
+A teoria das filas é o estudo matemático de sistemas com filas, fornecendo maneiras de analisar o tamanho da fila, o tempo de espera (latência) e a utilização (baseada no tempo). Muitos componentes da computação, tanto de software como de hardware, podem ser modelados como sistemas de filas (*queueing systems*). A modelação de múltiplos sistemas de filas é chamada de redes de filas (*queueing networks*).
+
+A teoria das filas baseia-se em várias áreas da matemática e da estatística, incluindo distribuições de probabilidade, processos estocásticos, a fórmula de Erlang e a Lei de Little. Lei de Little pode ser expressa como:
+
+$`L = \alpha W`$
+
+que determina o número médio de pedidos num sistema ($`L`$), com uma taxa média de chegada ($`alpha`$) multiplicada pelo tempo médio de serviço ($`W`$).
+
+Modelo de um sistema de filas simples:
+
+![modeloFilas](images/modeloFilas.png)
+
+Tem um único centro de serviços que processa os trabalhos da fila. Os sistemas de filas podem ter vários centros de serviços que processam o trabalho em paralelo. Na teoria das filas, os centros de serviços são frequentemente chamados de servidores.
+Os sistemas de filas podem ser categorizados por três fatores:
+- Processo de chegada: descreve o tempo de chegada entre pedidos para o sistema de filas, que pode ser aleatório, fixo ou uma distribuição (Poison, etc).
+- Distribuição do tempo de serviço: descreve os tempos de serviço do centro de serviços. Eles podem ser fixos (determinísticos), exponenciais ou de outro tipo de distribuição.
+- Número de centros de serviço: um ou muitos.
+
+Esses fatores podem ser escritos na notação de Kendall.
+
+##### Notação Kendall
+
+Esta notação atribui códigos para cada atributo. Tem a forma A/S/m.
+
+Estes são o processo de chegada (A), a distribuição do tempo de serviço (S) e o número de centros de serviço (m). Há também uma forma estendida da notação de Kendall que inclui mais fatores: número de buffers no sistema, tamanho da população e disciplina de serviço.
+
+### Planeamento de capacidade (Capacity Planning)
+
+O planeamento de capacidade examina como o sistema lidará com a carga e como irá escalar quando a carga escala. Pode ser executado de várias maneiras, incluindo o estudo de limites de recursos, análise de fatores e modelação.
+
+Para o planeamento de capacidade de uma aplicação específica, é útil ter um objetivo de desempenho quantificado para o planeamento.
+
+#### Limites dos Recursos
+
+Essa abordagem é uma pesquisa pelo recurso que se tornará o bottleneck sob carga. Os passos são:
+1. Medir a taxa de pedidos ao servidor e monitorizar essa taxa ao longo do tempo.
+2. Medir o uso de recursos de hardware e software. Monitorizar essa taxa ao longo do tempo.
+3. Expressar pedidos ao servidor em termos de recursos utilizados.
+4. Extrapolar os pedidos ao servidor para limites conhecidos (ou determinados experimentalmente) para cada recurso.
+
+Os recursos a serem monitorizados incluem:
+- Hardware: utilização de CPU, uso de memória, IOPS do disco, throughput do disco, capacidade do disco, throughput da rede
+- Software: uso da memória virtual , processos/tasks/threads, descritores de ficheiros
+
+#### Análise de Fatores
+
+Ao comprar e realizar o deployment de novos sistemas, muitas vezes há muitos fatores que podem ser alterados para alcançar o desempenho desejado. A tarefa geralmente é atingir o desempenho necessário pelo custo mínimo.
+
+Testar todas as combinações determinaria qual tem a melhor relação preço/desempenho; no entanto, isso pode sair rapidamente do controlo.
+
+Uma solução é testar um conjunto limitado de combinações. Aqui está uma abordagem baseada em conhecer a configuração máxima do sistema:
+
+1. Testar o desempenho com todos os fatores configurados para o máximo.
+2. Mudar os fatores um por um, testando o desempenho (ele deve diminuir para cada um).
+3. Atribuuir uma queda de desempenho percentual para cada fator, com base nas medições, juntamente com a poupança de custos.
+4. Começando com o máximo desempenho (e custo), escolher fatores para economizar custos, mantendo os pedidos necessários por segundo com base na queda de desempenho combinada.
+5. Testar novamente a configuração calculada para confirmação do desempenho entregue.
+
+#### Soluções Escalares (Scaling Solutions)
+
+Atender às demandas de desempenho mais alto sempre significou sistemas maiores, uma estratégia chamada de escala vertical (*vertical scaling*). A distribuição de carga em vários sistemas, geralmente liderados por balanceadores de carga, que fazem com que todos sejam exibidos como um, é chamado de escala horizontal (*horizontal scaling*).
+
+A escalabilidade depende muito das cargas de trabalho necessárias e das aplicações que se deseja usar.
+
+### Estatisticas
+
+Ler livro da página 69 a 74 (106 a 111)
+
+### Monitorização
+
+A monitorização do desempenho do sistema registra estatísticas de desempenho ao longo do tempo, de modo que o passado possa ser comparado com o presente e os padrões de uso baseados no tempo possam ser identificados. Isto é útil para o planeamento de capacidade, quantificando o crescimento e mostrando o pico de uso.
+
+#### Padrões baseados no tempo (Time-Based Patterns)
+
+Vários ciclos de comportamento podem ser vistos em dados históricos, incluindo:
+- Por hora: a atividade pode ocorrer a cada hora no ambiente da aplicação, tais como tarefas de monitorização e de reporting. Também é comum que serem executados com um ciclo de 5 ou 10 minutos.
+- Diariamente: Pode haver um padrão diário de uso que coincida com as horas de trabalho (9:00 a 17:00), que pode ser esticado se o servidor for para vários fusos horários. Outras atividades diárias podem incluir a rotação noturna de registros e backups.
+- Semanalmente: além de um padrão diário, pode haver um padrão semanal presente com base em dias úteis e fins de semana.
+- Trimestralmente: Os relatórios financeiros são feitos num cronograma trimestral.
+
+#### Monitorizar Produtos
+
+Existem muitos produtos de terceiros para monitorização de desempenho do sistema. Os recursos típicos incluem arquivamento de dados e apresentação como gráficos interativos baseados no browser e fornecimento de alertas configuráveis.
+
+Alguns deles operam executando agentes no sistema para reunir as estatísticas. Estes agentes executam ferramentas de observação do sistema operatvio (como o *sar*) e processam a saída ou vinculam diretamente a bibliotecas e interfaces do sistema operativo para ler as estatísticas diretamente.
+
+Há também soluções de monitorização que usam o SNMP. Eles geralmente evitam a necessidade de executar agentes personalizados no sistema, desde que ele tenha suporte a SNMP.
+
+À medida que os sistemas se tornam mais distribuídos e o uso de cloud computing aumenta, é necessário monitorizar mais sistemas, talvez centenas ou milhares. É onde um produto de monitorização centralizado pode ser especialmente útil, permitindo que um ambiente inteiro seja monitorizado a partir de uma interface.
+
+Algumas empresas preferem desenvolver as suas próprias soluções de monitorização para atender melhor o seu ambiente e as suas necessidades.
+
+#### Summary-since-Boot
+
+Se a monitorização não tiver sido executada, verifique se pelo menos os valores do summary-since-boot disponíveis no sistema operativo, que podem ser usados para comparar com os valores atuais.
+
+### Visualizações
+
+As visualizações permitem que mais dados sejam examinados do que pode ser visto num texto.
+
+Permitem também o reconhecimento de padrões e correspondência de padrões. Esta pode ser uma maneira eficiente de identificar correlações entre diferentes fontes de métricas, que podem ser difíceis de realizar programaticamente, mas fáceis de serem visualmente.
+
+Tipos:
+- Line Chart (Line Graph): É usado para examinar as métricas de desempenho ao longo do tempo, mostrando a passagem do tempo no eixo x. Várias linhas podem ser desenhadas, mostrando dados relacionados no mesmo conjunto de eixos. Os valores estatísticos também podem ser desenhados, fornecendo mais informações sobre a distribuição dos dados. 
+- Scatter Plots: gráfico de dispersão, permite identificar outliers contudo torna-se difcil de distinguir pontos, quando os dados a procesar são muitos.
+- Heat Maps: Os mapas de calor podem resolver o problema de escalabilidade do gráfico de dispersão quantificando os intervalos x e y em grupos chamados de depósitos. Eles são exibidos como pixels grandes, coloridos com base no número de eventos nesse intervalo x e y. Esta quantização também resolve o limite de densidade visual do gráfico de dispersão, permitindo que os mapas de calor mostrem dados de um único sistema ou milhares de sistemas da mesma maneira. Eles podem ser usados para a análise de latência, utilização e outras métricas. Os outliers podem ser identificados como blocos que estão no mapa de calor de cores claras. Padrões na maior parte dos dados começam a surgir, o que pode ser impossível de ver com um gráfico de dispersão.
+- Surface Plot: Esta é uma representação de três dimensões, renderizada como uma superfície tridimensional. Funciona melhor quando o valor da terceira dimensão não muda drasticamente de um ponto para o outro, produzindo uma superfície que lembra colinas onduladas. Um gráfico de superfície geralmente é renderizado como um modelo de estrutura de arame (*wireframe model*). A cor também é definida para refletir o valor de utilização.
+- Visualization Tools: A análise de desempenho do Unix tem-se concentrado historicamente no uso de ferramentas baseadas em texto, devido em parte ao suporte gráfico limitado. Tais ferramentas podem ser executadas rapidamente numa sessão de login e reportar dados em tempo real. As visualizações demoram mais tempo para aceder e geralmente exigem um ciclo de rastreamento e relatório. Ao trabalhar com problemas urgentes de desempenho, a velocidade com que se pode aceder às métricas pode ser crítica.
+As ferramentas de visualização modernas fornecem visualizações em tempo real do desempenho do sistema, acessíveis a partir do navegador e de dispositivos móveis.
+
+## Chapter 3 - Sistemas Operativos
+
