@@ -122,20 +122,72 @@ TODO: Quando dermos, preencher
 
 O SPARQL permite que uma query consista em padrões de triplos, conjunções, disjunções e padrões opcionais.
 
-#### Queries
+#### Cheat sheet
 
-No caso de queries que lêm dados da base de dados o SPARQL especifica quatro variações diferentes para diferentes objetivos.
+![sparqlCS](images/sparqlCS.png)
+
+#### Prefixos comuns
+
+- rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+- rdfs: http://www.w3.org/2000/01/rdf-schema#
+- owl: http://www.w3.org/2002/07/owl#
+- xsd: http://www.w3.org/2001/XMLSchema#
+- dc: http://purl.org/dc/elements/1.1/
+- foaf: http://xmlns.com/foaf/0.1/
+
+Mais prefixos em: http://prefix.cc
+
+#### Anatomia da Query
+
+![querySPQ](images/querySQL.png)
+
+No caso de queries que lêm dados da base de dados o SPARQL especifica quatro tipos diferentes para diferentes objetivos:
 
 - SELECT query: Usado para extrair valores brutos de um terminal SPARQL, os resultados são devolvidos num formato em tabela
 - CONSTRUCT query: Usado para extrair informações do terminal SPARQL e transformar os resultados em triplos RDF válidos
 - ASK query: Usado para fornecer um resultado True/False para uma consulta num terminal SPARQL
 - DESCRIBE query: Usado para extrair um grafo RDF do terminal SPARQL, cujo conteúdo é deixado para o terminal decidir com base no que considera como informações úteis
 
-Cada um desses formatos usa um bloco WHERE para restringir a consulta, embora, no caso da consulta DESCRIBE, o WHERE seja opcional.
+Cada um destes formatos usa um bloco WHERE para restringir a consulta, embora, no caso da consulta DESCRIBE, o WHERE seja opcional.
 
 Para além disso após o WHERE é possível usar blocos tais como LIMIT, GROUP BY, ORDER BY etc. Na query pode ser usado por exemplo o COUNT, DISTINCT, etc.
 
-TODO: Completar
+#### Combinação de padrões SPARQL
+
+- Um ou mais triplos: `A . B`, Conjunção (JOIN). Os resultados tem de "respeitar" A e B 
+- Opcional: `A OPTIONAL {B}`, Left Join. Mantém a solução que "respeitam" A mesmo que não respeitem B.
+- Either-or: `{A} UNION {B}`, Dinsjunção. Inclui ambos os resultados que respeitem A e/ou que respeitem B.
+- Subtracted: `A MINUS {B}`, Negação. Inclui apenas os resultados que Respeitam A, mas que não respeitam B. 
+
+#### Subqueries
+
+![Subqueries](images/subqueries.png)
+
+#### Filtros SPARQL
+
+Os filtros eliminam soluções que fazem que a expressão seja falsa.
+
+Filtros inline: `A . B . FILTER( ... expr ... )`
+
+Filtros:
+
+![filtrosSQL](images/filtrosSQL.png)
+
+#### Aggregates
+
+1. Particiona os resultados em grupos baseados na expressão presente na claúsula GROPUP BY.
+
+2. Avalia projeções e agrega funções na claúsula SELECT para obter um resultado por grupo. Funções disponíveis: COUNT, SUM, AVG, MIN, MAX, SAMPLE, GROUP_CONCAT
+
+3. Filtra os resultados agregados através da claúsula HAVING.
+
+#### Property Paths
+
+Property Paths permite que padrões de triplos façam match com caminhos de comprimento arbitrário por meio de um grafo.
+
+Os predicados são combinados com operadores semelhantes a expressões regulares:
+
+![PropPaths](images/propPaths.png)
 
 ## Linguagens
 
