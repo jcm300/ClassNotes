@@ -66,7 +66,7 @@ $`D(i,j) = d(P_i,P_j)`$ [a matriz D é simétrica]
 
 $`D(i,j)`$: distância entre as "cidades" i e j
 
-### Método de Monte Carlo:
+### Método de Monte Carlo (Metropolis):
 
 começa com:
 
@@ -341,3 +341,37 @@ $`
 É um algoritmos para multiplicação de matrizes. É mais rápido que o algoritmo padrão para a multiplicação de matrizes e é util na prática para matrizes grandes, mas seria mais lento que os algoritmos mais rápidos conhecidos para matrizes extremamente grandes.
 
 Complexidade assintótica: O($`N^{2.8074}`$)
+
+## Discretização
+
+Passagem de um domínio contínuo para uma malha de pontos discreta. Cada ponto da malha dá origem a uma equação linear. Após aplicar a malha são feitas aproximações em cada ponto consoante o valor do ponto e da zona em redor do mesmo (stencil). O número de incógnitas em cada ponto dependem da vizinhança considerada (stencil).
+
+Nesta descretização do problema, há erros de truncatura, sendo que este erro depende do "passo" entre pontos (ou seja, de forma a reduzir os erros de truncatura aumenta-se o número de pontos da malha).
+
+A malha pode ser representada por uma matriz esparsa em que cada ponto é representado por uma linha.
+
+Os coeficientes do stencil tem como base a Fórmula de Taylor.
+
+## Sistemas de Equações Lineares
+
+$`A x = b`$
+
+- Métodos Diretos
+    - Usados para matrizes densas, principalmente.
+    - Transformam A.
+- Métodos Iterativos
+    - Usado para matrizes grandes e esparsas, principalmente.
+    - Não transformam A, baseiam-se em matrizes por vetores (BLAS 2), $`A . v`$
+    - Problema: Convergência. Converge?
+
+### Método de Eliminação de Gauss
+
+$`Ax=b`$ --- operações de equivalência (redução) --> $`Ux=b'`$ (U = matriz triangular superior) => depois efetuar substituições (back substitution - substituição inversa), cada substituição pode ser expressa numa saxpy (BLAS 1)
+
+#### Pivotagem Parcial
+
+O aparecimento de pivots nulos ou muito pequenos no método de eliminação de gauss tem efeitos catastróficos a nível numérico, levando em imensos casos a elevada instabilidade. Esta instabilidade pode (na maior parte dos casos) ser eliminada escolhendo, em cada passo, para  pivot o maior elemento. Para tal, depois de identificar tal elemento, basta efectuar uma simples troca de linhas e/ou colunas. Esta técnica chamasse pivotagem.
+
+A pivotagem parcial consiste em, no passo k, escolher o pivot entre os elementos da coluna k que se encontram abaixo da diagonal.
+
+ Há também pivotagem total que garante que os erros são ainda menores que na Pivotagem Parcial.
