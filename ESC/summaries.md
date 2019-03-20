@@ -662,3 +662,36 @@ As ferramentas de visualização modernas fornecem visualizações em tempo real
 
 ## Chapter 3 - Sistemas Operativos
 
+### Terminologia
+
+- __Sistema Operativo__: software e ficheiros que são instalados num sistema de forma que consegue realizar o boot e executar programas. Inclui o kernel, ferramentas de administração e bibliotecas do sistema.
+- __Kernel__: O kernel é um programa que gere o sistema, incluindo dispositivos (hardware), memória, e CPU scheduling. Corre num modo privilegiado do CPU que permite acesso direto ao hardware, chamado de *kernel mode*.
+- __Processo__: uma abstração do Sistema Operativo e do ambiente para a execução de um programa. O programa normalmente corre em *user mode*, com acesso ao *kernel mode* através de *system calls* ou *traps*.
+- __Thread__: um contexto de execução que pode ser escalunado para correr num CPU. O kernel tem múltiplas threads, e um processo contém uma ou mais.
+- __Task__: uma entidade executável do Linux, que pode referir-se a um processo (com apenas uma thread), a uma thread de um processo multithreaded, ou a threads do kernel.
+- __Kernel-space__: espaço de endereço de memória para para o kernel.
+- __User-space__: espaço de endereço de memória para processos.
+- __User-land__: programas e bibliotecas user-level (/usr/bin, /usr/lib, ...)
+- __Troca de Contexto (Context Switch)__: uma rotina do kernel que troca entre diferentes espaços de endereçamento (contexto) onde o CPU opera. 
+- __Chamada ao Sistema (system call - syscall)__: um protocolo bem definido para programas do utilizador realizar pedidos ao kernel para reailizar operações priviligiadas, incluindo dispositivos I/O.
+- __Processador (Processor)__: não deve ser confundido com processo, um processador é um chip físico contendo um ou mais CPU's.
+- __Trap__: um sinal enviado ao kernel, pedindo uma rotina do sistema (ação priviligiada). Os tipos de trap's incluem system calls, exceções do processador e interrupções.
+- __Interrupção (Interrupt)__: um sinal enviado ao dispositivos físicos pelo kernel, normalmente para realizar pedidos de I/O. Uma interrupção é um tipo de trap.
+
+### Background
+
+#### Kernel
+
+O kernel gere o scheduling do CPU, a memória, os sistemas de ficheiros, os protocolos de redes e os dispositivos do sistema (discos, interfaces de rede, etc). Providencia acesso aos dispositivos e serviços do kernel através de system calls. Para além disso, as bibliotecas do sistema, são fornecidas por forma a providenciar uma interface de programação mais facil e rica do que apenas as system calls.
+
+![kernel](images/kernel.png)
+
+As bibliotecas são mostradas com um anel quebrado de forma a demonstrar que as aplicações podem chamar system calls diretamente (se permitido pelo SO).
+
+##### Execução do Kernel
+
+O kernel é um programa grande, tipicamente com centenas de linhas de código. Primeiramente executa sob demanda, quando um programa user-level chama uma system call ou quando um dispositivo envia uma interrupção. Algumas threads do kernel operam assincronamente para governar internamente, que pode incluir a rotina de clock do kernel e tarefas de gestão de memória, sendo que estas tentam ser leves bem como tentam consumir poucos recursos de CPU. Workloads que frequentemente realizam I/O, frequentemente executam em *kernel context*. Workloads que são *compute-intensive* são deixadas sozinhas quanto possível pelo kernel, visto que assim elas podem correr interruptamente no CPU. Pode ser tentador pensar que o kernel não pode afetar a performance desses workloads, mas há muitos casos em que afeta. O mais óbvio é contenção de CPU, quando há threads a competir por recursos do CPU e o scheduler do kernel precisa de decidir quais vão correr e quais vão esperar. O kernel também escolhe em que CPU uma thread irá executar e pode escolher CPU's com caches "aquecidas" ou com melhor localidade de memória para o processo, de forma a melhorar significativamente a performance.
+
+##### Clock
+
+Pag: 88 - Clock
