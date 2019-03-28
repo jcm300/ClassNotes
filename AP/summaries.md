@@ -342,16 +342,6 @@ $`
 
 Complexidade assintótica: O($`N^{2.8074}`$)
 
-## Discretização
-
-Passagem de um domínio contínuo para uma malha de pontos discreta. Cada ponto da malha dá origem a uma equação linear. Após aplicar a malha são feitas aproximações em cada ponto consoante o valor do ponto e da zona em redor do mesmo (stencil). O número de incógnitas em cada ponto dependem da vizinhança considerada (stencil).
-
-Nesta descretização do problema, há erros de truncatura, sendo que este erro depende do "passo" entre pontos (ou seja, de forma a reduzir os erros de truncatura aumenta-se o número de pontos da malha).
-
-A malha pode ser representada por uma matriz esparsa em que cada ponto é representado por uma linha.
-
-Os coeficientes do stencil tem como base a Fórmula de Taylor.
-
 ## Representação de Matrizes
 
 Seja:
@@ -403,6 +393,12 @@ $`y_n=e_{n-1} . x_{n-1} + d_n . x_n`$
 Com esta abordagem poupa-se em espaço de memória e em número de operações aritméticas realizadas.
 
 Complexidade: $`O(N)`$
+
+## Matriz dominante
+
+Uma matriz é dominantes se e só se (Condição suficiente), para cada linha da matriz:
+
+$`|a{ii}|>\sum_{j=1 j;\neq i}^{n} |a_{ij}|`$
 
 ## Sistemas de Equações Lineares
 
@@ -619,3 +615,33 @@ $`\vdots`$
 $`e^k=E^ke^{(0)}`$
 
 Portanto, de forma a reduzir o erro e de forma a convergir, $`E`$ deve tender para 0.
+
+#### Método Gauss-Seidel
+
+$`x_i^{(k+1)}= \frac{b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \sum_{j=i+1}^n a_{ij} x_j^{(k)})}{a_{ii}}`$
+
+$`Ax = b \rightarrow (L+D+U)x = b \rightarrow (L+D)x = b - Ux`$
+
+Logo:
+
+$`E = -(L+D)^{-1}*U \\
+f = (L+D)^{-1}*b 
+`$
+
+Tendencialmente $`||E||_{Jacobi} > ||E||_{Gauss-Seidel}`$ logo o método Gauss-Seidel converge tendencialmente mais rapidamente que o método de Jacobi.
+
+## Equação de Poison
+
+$`\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}`$
+
+Objetivo: Descobrir $`u(x,y)`$, ou seja, temperatura no estado de equilibrio ("steady state" temperature). Não há variação no tempo.
+
+### Discretização
+
+Passagem de um domínio contínuo para uma malha de pontos discreta. Cada ponto da malha dá origem a uma equação linear. Após aplicar a malha são feitas aproximações em cada ponto consoante o valor do ponto e da zona em redor do mesmo (stencil). O número de incógnitas em cada ponto dependem da vizinhança considerada (stencil).
+
+Nesta descretização do problema, há erros de truncatura, sendo que este erro depende do "passo" entre pontos (ou seja, de forma a reduzir os erros de truncatura aumenta-se o número de pontos da malha).
+
+A malha pode ser representada por uma matriz esparsa em que cada ponto é representado por uma linha.
+
+Os coeficientes do stencil tem como base a Fórmula de Taylor.

@@ -233,6 +233,15 @@ Property(
         )
 ```
 
+Em OWL há dois tipos de classes:
+- Classes Primitivas:
+  - Inclui apenas condições necessárias(mas não suficientes) pela associação.
+  - Permite deduções em apenas um sentido.
+- Classes Definidas:
+  - Uma classe definida é como uma declaração lógica do tipo "se e só se".
+  - Inclui condições necessárias e suficientes pela associação.
+  - Permite deduções nos dois sentidos.  
+
 ## Turtle
 
 ```turtle
