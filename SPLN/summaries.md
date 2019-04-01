@@ -387,3 +387,52 @@ Permite comparações independentes dos pontos de corte escolhidos.
 Indisponibilidade de conjuntos de dados de referência: precisão ainda pode ser mensurável.
 
 Às vezes, não é claro o que pode ser considerado falso positivo ou falso negativo.
+
+## N-grams & markov chains
+
+### Contar frequências (N-grams)
+
+- ocorrências de palavras isoladas (unigrams)
+- ocorrências de duas palavras (bigrams)
+- ocorrências de três palavras (trigrams)
+- ...
+- N-grams: Sequência de N words (ou caracteres)
+
+#### Aplicações
+
+- Determinar a probabilidade de uma tradução automática automatizada estar correta
+- Prever a próxima palavra mais provável a ocorrer numa frase
+- Gerar texto automaticamente de fala
+- Automatizar a correção ortográfica
+- determinar o sentimento relativo de um pedaço de texto
+
+### Markov Chains
+
+#### Probabilidade Condicional
+
+Se X e Y são dois eventos, então a probabilidade condicional de X com respeito a Y é denotado:
+
+$`P(X|Y)`$
+
+Probabilidade do evento X, dado que o Y já ocorreu.
+
+#### Regra da cadeia de probabilidade
+
+![RegraCadeia1](images/regraCadeia1.png)
+
+![RegraCadeia2](images/regraCadeia2.png)
+
+![RegraCadeia2](images/regraCadeia3.png)
+
+#### Pressuposto de Markov
+
+A probabilidade de qualquer evento dado pode ser aproximada levando em consideração apenas os eventos passados mais próximos. Ou seja:
+
+![pressMarkov](images/pressMarkov.png)
+
+#### Markov Chain
+
+Uma sequência de "estados" aleatórios onde cada novo estado é condicional apenas no estado anterior.
+
+Exemplo:
+![ExemploMarkov](images/exemMarkov.png)
