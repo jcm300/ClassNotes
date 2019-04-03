@@ -632,7 +632,7 @@ Tendencialmente $`||E||_{Jacobi} > ||E||_{Gauss-Seidel}`$ logo o método Gauss-S
 
 ## Equação de Poison
 
-$`\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}`$
+$`\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}=0`$
 
 Objetivo: Descobrir $`u(x,y)`$, ou seja, temperatura no estado de equilibrio ("steady state" temperature). Não há variação no tempo.
 
@@ -645,3 +645,67 @@ Nesta descretização do problema, há erros de truncatura, sendo que este erro 
 A malha pode ser representada por uma matriz esparsa em que cada ponto é representado por uma linha.
 
 Os coeficientes do stencil tem como base a Fórmula de Taylor.
+
+Aplica-se a equação de Poison a todos os pontos da malha de discretização.
+
+### Diferença Finita
+
+Troca das derivadas parciais por stencils (aproximação). Visto ser um aproximação, apresenta um erro de truncatura.
+
+$`f'(x) = \lim_{h \to 0^+} \frac{f(x+h)-f(x)}{h}`$ pode ser aproximado por:
+
+$`f'(x) = \frac{f(x+h)-f(x)}{h} + O(h)`$ sendo $`O(h)`$ o erro de truncatura.
+
+A aproximação anterior é pior que a seguinte:
+
+$`f'(x) = \frac{f(x+\frac{h}{2})-f(x-\frac{h}{2})}{h} + O(h^2) = \frac{f(x+h)-f(x-h)}{2h} + O(h^2)`$
+ 
+visto que o erro de truncatura é menor neste caso.
+
+### Equação de Poison aplicando Diferenças Finitas
+
+$`\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}=0 \Leftrightarrow
+\frac{u(x+h,y) - 2u(x,y) + u(x-h,y)}{h^2} + \frac{u(x,y+k) - 2u(x,y) + u(x,y-k)}{k^2} = 0`$
+
+### Mais concretamente (discretização do problema)
+
+![Malha](images/malha.jpg)
+
+- A azul os pontos que conheço o valor (pontos de fronteira, valores de fronteira - boundering values)
+- A preto os pontos nos quais não conheço o valor e que quero descobrir, ou seja, que serão calculados
+
+$`Au=b`$
+
+Cada u interior é a média aritmética dos 4 pontos à volta, ou seja, Five-point stencil.
+
+$`\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}=0 \Leftrightarrow
+\frac{u(x+h,y) - 2u(x,y) + u(x-h,y)}{h^2} + \frac{u(x,y+h) - 2u(x,y) + u(x,y-h)}{h^2} = 0 \Leftrightarrow
+4u(x,y) = u(x,y-h) + u(x-h,y) + u(x+h,y) + u(x,y+h) \Rightarrow
+u(i,j) = \frac{u(i-1,j) + u(i,j-1) + u(i,j+1) + u(i+1,j)}{4}`$
+
+#### Critério de paragem usado nos algoritmos iterativos
+
+$`||u^{(k+1)}-u^{(k)}|| \leq TOL`$
+
+#### Custo de cada iteração
+
+$`(N-2)^2 * (3 (adições) + 1 (divisão))`$ FLOPS
+
+sendo $`N`$ a ordem da malha ("matriz")
+
+### Estratégia Red-Black
+
+Esta estratégia apenas pode ser aplicada se for usado o método iterativo Gauss-Seidel. Para o Jacobi todos os pontos podiam ser atualizados ao mesmo tempo, visto não haver dependências de dados, logo não seria necessário esta estratégia.
+
+![RedBlack](images/redBlack.jpg)
+
+Há duas atualizações (passagens pela malha). Por exemplo: a 1º passagem pelos pontos cinzas e a segunda pelo pontos pretos, ou vice versa.
+
+### Conclusões
+
+Quanto maior o N:
+- maior é o custo de cada iteração
+- queremos mais precisão (caso $`TOL = \frac{1}{N^2}`$)
+- a convergência é mais lenta
+
+Logo maior é o peso computacional (mais tempo demora a ser calculado).
